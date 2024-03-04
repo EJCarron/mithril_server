@@ -1,13 +1,14 @@
 # import flast module
-from flask import Flask, request
+from flask import Flask, request, make_response, jsonify
 import mithril
+
 
 # instance of flask application
 app = Flask(__name__)
 
 
 # home route that returns below text when root url is accessed
-@app.route("/createnetwork")
+@app.route("/createnetwork", methods=['POST'])
 def createnetwork():
     body = request.get_json()
 
@@ -21,12 +22,105 @@ def createnetwork():
                               save_neo4j=body.get('save_neo4j', False),
                               overwrite_neo4j=body.get('overwrite_neo4j', False),
                               same_as=body.get('same_as', None),
-                              expand=body.get('expand', 0)
+                              expand=body.get('expand', 0),
+                              network_name=body.get('network_name', '')
                               )
-    except:
-        return 'fail'
 
-    return 'success'
+        resp = make_response('fuck you', 200)
+        return resp
+    except:
+        resp = make_response('You fucked up', 400)
+        return resp
+
+
+@app.route("/add_offshore_leak_connections_to_network", methods=['POST'])
+def add_offshore_leak_connections_to_network():
+    body = request.get_json()
+
+    try:
+        json_path = body.get('json_path', None)
+        if json_path is None:
+            resp = make_response('no json path', 400)
+            return resp
+
+        matches = body.get('matches', None)
+        if matches is None:
+            resp = make_response('no matches', 400)
+            return resp
+
+        mithril.add_offshore_leak_connections_to_network(json_path=json_path, matches=matches)
+
+        resp = make_response('set', 200)
+
+        return resp
+
+    except:
+        resp = make_response('You fucked up', 400)
+        return resp
+
+
+@app.route('/export_network', methods=['POST'])
+def export_network():
+    body = request.get_json()
+
+    try:
+        json_path = body.get('json_path', None)
+        if json_path is None:
+            resp = make_response('no json path', 400)
+            return resp
+
+        if body.get('save_csvs_path', '') != '':
+            mithril.loadjsonsavecsvs(load_path=json_path, save_path=body['save_csvs_path'])
+
+        if body.get('save_xlsx_path', '') != '':
+            mithril.loadjsonsavexlsx(load_path=json_path, save_path=body['save_xlsx_path'])
+
+        if body.get('save_neo4j', False):
+            mithril.loadjsoncreategraph(load_path=json_path, overwrite_neo4j=body.get('overwrite_neo4j', False))
+
+        resp = make_response('export complete', 200)
+
+        return resp
+
+    except:
+        resp = make_response('You fucked up', 400)
+        return resp
+
+
+@app.route("/find_ol_connections", methods=['POST'])
+def find_ol_connections():
+    body = request.get_json()
+
+    try:
+        json_path = body.get('json_path', None)
+        if json_path is None:
+            resp = make_response('no json path', 400)
+            return resp
+
+        potential_matches = mithril.find_potential_offshore_leaks_matches(json_path)
+
+        resp = make_response(jsonify(potential_matches), 200)
+
+        return resp
+
+    except:
+        resp = make_response('You fucked up', 400)
+        return resp
+
+
+@app.route("/setconfig", methods=['POST'])
+def setconfig():
+    body = request.get_json()
+
+    try:
+        mithril.setconfig(**body)
+
+        resp = make_response('fuck you', 200)
+        return resp
+
+    except:
+        resp = make_response('You fucked up', 400)
+        return resp
 
 
 if __name__ == '__main__':
