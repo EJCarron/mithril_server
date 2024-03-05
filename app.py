@@ -2,7 +2,6 @@
 from flask import Flask, request, make_response, jsonify
 import mithril
 
-
 # instance of flask application
 app = Flask(__name__)
 
@@ -13,22 +12,21 @@ def createnetwork():
     body = request.get_json()
 
     try:
-        mithril.createnetwork(ch_officer_ids=body.get('ch_officer_ids', None),
-                              ch_company_numbers=body.get('ch_company_numbers', None),
-                              ol_node_ids=body.get('ol_node_ids', None),
-                              save_json_path=body.get('save_json_path', ''),
-                              save_csvs_path=body.get('save_csvs_path', ''),
-                              save_xlsx_path=body.get('save_xlsx_path', ''),
-                              save_neo4j=body.get('save_neo4j', False),
-                              overwrite_neo4j=body.get('overwrite_neo4j', False),
-                              same_as=body.get('same_as', None),
-                              expand=body.get('expand', 0),
-                              network_name=body.get('network_name', '')
-                              )
+        network = mithril.createnetwork(ch_officer_ids=body.get('ch_officer_ids', None),
+                                        ch_company_numbers=body.get('ch_company_numbers', None),
+                                        ol_node_ids=body.get('ol_node_ids', None),
+                                        save_csvs_path=body.get('save_csvs_path', ''),
+                                        save_xlsx_path=body.get('save_xlsx_path', ''),
+                                        save_neo4j=body.get('save_neo4j', False),
+                                        overwrite_neo4j=body.get('overwrite_neo4j', False),
+                                        same_as=body.get('same_as', None),
+                                        expand=body.get('expand', 0),
+                                        network_name=body.get('network_name', '')
+                                        )
 
-        resp = make_response('fuck you', 200)
+        resp = make_response(network.to_json(), 200)
         return resp
-    except:
+    except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
 
