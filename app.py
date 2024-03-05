@@ -36,19 +36,22 @@ def add_offshore_leak_connections_to_network():
     body = request.get_json()
 
     try:
-        json_path = body.get('json_path', None)
-        if json_path is None:
-            resp = make_response('no json path', 400)
-            return resp
+
+        network_dict = body.get('network', None)
+
+        if network_dict is None:
+            return make_response('no network dingus', 400)
+
+        network = mithril.make_network_from_dict(network_dict)
 
         matches = body.get('matches', None)
         if matches is None:
             resp = make_response('no matches', 400)
             return resp
 
-        mithril.add_offshore_leak_connections_to_network(json_path=json_path, matches=matches)
+        updated_network = mithril.add_offshore_leak_connections_to_network(network=network, matches=matches)
 
-        resp = make_response('set', 200)
+        resp = make_response(updated_network.to_json(), 200)
 
         return resp
 
@@ -93,18 +96,20 @@ def find_ol_connections():
     body = request.get_json()
 
     try:
-        json_path = body.get('json_path', None)
-        if json_path is None:
-            resp = make_response('no json path', 400)
-            return resp
+        network_dict = body.get('network', None)
 
-        potential_matches = mithril.find_potential_offshore_leaks_matches(json_path)
+        if network_dict is None:
+            return make_response('no network dingus', 400)
+
+        network = mithril.make_network_from_dict(network_dict)
+
+        potential_matches = mithril.find_potential_offshore_leaks_matches(network)
 
         resp = make_response(jsonify(potential_matches), 200)
 
         return resp
 
-    except:
+    except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
 
