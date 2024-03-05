@@ -62,19 +62,22 @@ def export_network():
     body = request.get_json()
 
     try:
-        json_path = body.get('json_path', None)
-        if json_path is None:
-            resp = make_response('no json path', 400)
-            return resp
+
+        network_dict = body.get('network', None)
+
+        if network_dict is None:
+            return make_response('no network dingus', 400)
+
+        network = mithril.make_network_from_dict(network_dict)
 
         if body.get('save_csvs_path', '') != '':
-            mithril.loadjsonsavecsvs(load_path=json_path, save_path=body['save_csvs_path'])
+            mithril.exportcsvs(network=network, export_path=body['save_csvs_path'])
 
         if body.get('save_xlsx_path', '') != '':
-            mithril.loadjsonsavexlsx(load_path=json_path, save_path=body['save_xlsx_path'])
+            mithril.exportxlsx(network=network, export_path=body['save_xlsx_path'])
 
         if body.get('save_neo4j', False):
-            mithril.loadjsoncreategraph(load_path=json_path, overwrite_neo4j=body.get('overwrite_neo4j', False))
+            mithril.exportgraph(network=network, overwrite_neo4j=body.get('overwrite_neo4j', False))
 
         resp = make_response('export complete', 200)
 
