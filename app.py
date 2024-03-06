@@ -60,6 +60,34 @@ def add_offshore_leak_connections_to_network():
         return resp
 
 
+@app.route("/add_registered_interests_connections_to_network", methods=['POST'])
+def add_registered_interests_connections_to_network():
+    body = request.get_json()
+
+    try:
+
+        network_dict = body.get('network', None)
+
+        if network_dict is None:
+            return make_response('no network dingus', 400)
+
+        network = mithril.make_network_from_dict(network_dict)
+
+        matches = body.get('matches', None)
+        if matches is None:
+            resp = make_response('no matches', 400)
+            return resp
+
+        updated_network = mithril.add_registered_interests_connections_to_network(network=network, matches=matches)
+
+        resp = make_response(updated_network.to_json(), 200)
+
+        return resp
+
+    except:
+        resp = make_response('You fucked up', 400)
+        return resp
+
 @app.route('/export_network', methods=['POST'])
 def export_network():
     body = request.get_json()
@@ -87,6 +115,28 @@ def export_network():
         return resp
 
     except:
+        resp = make_response('You fucked up', 400)
+        return resp
+
+@app.route("/find_registered_interests_connections", methods=['POST'])
+def find_registered_interests_connections():
+    body = request.get_json()
+
+    try:
+        network_dict = body.get('network', None)
+
+        if network_dict is None:
+            return make_response('no network dingus', 400)
+
+        network = mithril.make_network_from_dict(network_dict)
+
+        potential_matches = mithril.find_potential_registered_interests_matches(network)
+
+        resp = make_response(jsonify(potential_matches), 200)
+
+        return resp
+
+    except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
 
