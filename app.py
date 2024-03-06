@@ -163,6 +163,30 @@ def find_ol_connections():
         resp = make_response('You fucked up', 400)
         return resp
 
+@app.route("/expand", methods=['POST'])
+def expand():
+    body = request.get_json()
+
+    try:
+        network_dict = body.get('network', None)
+
+        if network_dict is None:
+            return make_response('no network dingus', 400)
+
+        network = mithril.make_network_from_dict(network_dict)
+
+        target_node_ids = body.get('node_ids', None)
+
+        expanded_network = mithril.expand_network(network=network, target_node_ids=target_node_ids)
+
+        resp = make_response(expanded_network.to_json(), 200)
+
+        return resp
+
+    except Exception as e:
+        resp = make_response('You fucked up', 400)
+        return resp
+
 
 @app.route("/setconfig", methods=['POST'])
 def setconfig():
