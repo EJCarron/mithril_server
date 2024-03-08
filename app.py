@@ -60,8 +60,8 @@ def add_offshore_leak_connections_to_network():
         return resp
 
 
-@app.route("/add_registered_interests_connections_to_network", methods=['POST'])
-def add_registered_interests_connections_to_network():
+@app.route("/add_electoral_commission_donation_connections_to_network", methods=['POST'])
+def add_electoral_commission_donation_connections_to_network():
     body = request.get_json()
 
     try:
@@ -78,15 +78,17 @@ def add_registered_interests_connections_to_network():
             resp = make_response('no matches', 400)
             return resp
 
-        updated_network = mithril.add_registered_interests_connections_to_network(network=network, matches=matches)
+        updated_network = mithril.add_electoral_commission_donation_connections_to_network(network=network,
+                                                                                           matches=matches)
 
         resp = make_response(updated_network.to_json(), 200)
 
         return resp
 
-    except:
+    except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
+
 
 @app.route('/export_network', methods=['POST'])
 def export_network():
@@ -114,12 +116,13 @@ def export_network():
 
         return resp
 
-    except:
+    except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
 
-@app.route("/find_registered_interests_connections", methods=['POST'])
-def find_registered_interests_connections():
+
+@app.route("/find_electoral_commission_donation_connections", methods=['POST'])
+def find_electoral_commission_donation_connections():
     body = request.get_json()
 
     try:
@@ -130,7 +133,7 @@ def find_registered_interests_connections():
 
         network = mithril.make_network_from_dict(network_dict)
 
-        potential_matches = mithril.find_potential_registered_interests_matches(network)
+        potential_matches = mithril.find_potential_electoral_commission_donation_matches(network)
 
         resp = make_response(jsonify(potential_matches), 200)
 
@@ -162,6 +165,7 @@ def find_ol_connections():
     except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
+
 
 @app.route("/expand", methods=['POST'])
 def expand():
