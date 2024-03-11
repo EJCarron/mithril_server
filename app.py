@@ -133,7 +133,7 @@ def find_electoral_commission_donation_connections():
 
         network = mithril.make_network_from_dict(network_dict)
 
-        potential_matches = mithril.find_potential_electoral_commission_donation_matches(network)
+        potential_matches = mithril.find_potential_electoral_commission_donation_matches(network, None)
 
         resp = make_response(jsonify(potential_matches), 200)
 
@@ -149,6 +149,7 @@ def find_ol_connections():
     body = request.get_json()
 
     try:
+        print('LOOKING FOR OL CONNECTION')
         network_dict = body.get('network', None)
 
         if network_dict is None:
@@ -203,6 +204,23 @@ def setconfig():
         return resp
 
     except:
+        resp = make_response('You fucked up', 400)
+        return resp
+
+
+@app.route("/companies_house_search", methods=['POST'])
+def companies_house_search():
+    body = request.get_json()
+
+    try:
+        search_result = mithril.companies_house_search(query=body['query'],
+                                                       page_number=body['page_number'],
+                                                       search_type=body.get('search_type', None)
+                                                       )
+
+        return make_response(jsonify(search_result), 200)
+    except Exception as e:
+        print(e)
         resp = make_response('You fucked up', 400)
         return resp
 
