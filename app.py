@@ -12,9 +12,7 @@ def createnetwork():
     body = request.get_json()
 
     try:
-        network = mithril.createnetwork(ch_officer_ids=body.get('ch_officer_ids', None),
-                                        ch_company_numbers=body.get('ch_company_numbers', None),
-                                        ol_node_ids=body.get('ol_node_ids', None),
+        network = mithril.createnetwork(core_nodes=body.get('core_nodes', []),
                                         save_csvs_path=body.get('save_csvs_path', ''),
                                         save_xlsx_path=body.get('save_xlsx_path', ''),
                                         save_neo4j=body.get('save_neo4j', False),
