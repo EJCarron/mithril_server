@@ -53,7 +53,7 @@ def add_offshore_leak_connections_to_network():
 
         return resp
 
-    except:
+    except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
 
@@ -109,6 +109,9 @@ def export_network():
 
         if body.get('save_neo4j', False):
             mithril.exportgraph(network=network, overwrite_neo4j=body.get('overwrite_neo4j', False))
+
+        if body.get('export_timeline_path', '') != '':
+            mithril.export_timeline(network=network, export_path=body['export_timeline_path'])
 
         resp = make_response('export complete', 200)
 
@@ -222,6 +225,30 @@ def companies_house_search():
         resp = make_response('You fucked up', 400)
         return resp
 
+# @app.route("/export_timeline")
+# def export_timeline():
+#     body = request.get_json()
+#
+#     try:
+#         network_dict = body.get('network', None)
+#
+#         if network_dict is None:
+#             return make_response('no network dingus', 400)
+#
+#         network = mithril.make_network_from_dict(network_dict)
+#
+#         export_path = body.get('export_path', None)
+#
+#         if export_path is None:
+#             return make_response('no export path dingus', 400)
+#
+#         mithril.export_timeline(network, export_path)
+#
+#         return make_response('success', 200)
+#
+#     except Exception as e:
+#         resp = make_response('You fucked up', 400)
+#         return resp
 
 if __name__ == '__main__':
     app.run()
