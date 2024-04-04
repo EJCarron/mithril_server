@@ -2,11 +2,9 @@
 from flask import Flask, request, make_response, jsonify
 import mithril
 
-# instance of flask application
 app = Flask(__name__)
 
 
-# home route that returns below text when root url is accessed
 @app.route("/createnetwork", methods=['POST'])
 def createnetwork():
     body = request.get_json()
@@ -24,6 +22,30 @@ def createnetwork():
 
         resp = make_response(network.to_json(), 200)
         return resp
+    except Exception as e:
+        resp = make_response('You fucked up', 400)
+        return resp
+
+@app.route("/make_same_as_connections", methods=['POST'])
+def make_same_as_connections():
+    body = request.get_json()
+
+    try:
+        network_dict = body.get('network', None)
+
+        if network_dict is None:
+            return make_response('no network dingus', 400)
+
+        network = mithril.make_network_from_dict(network_dict)
+
+        node_ids = body.get('node_ids', None)
+
+        network = mithril.make_same_as_connections(network=network, node_ids=node_ids)
+
+        resp = make_response(network.to_json(), 200)
+
+        return resp
+
     except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
@@ -193,18 +215,27 @@ def expand():
         resp = make_response('You fucked up', 400)
         return resp
 
-
-@app.route("/setconfig", methods=['POST'])
-def setconfig():
+@app.route("/add_nodes_to_network", methods=['POST'])
+def add_nodes_to_network():
     body = request.get_json()
 
     try:
-        mithril.setconfig(**body)
+        network_dict = body.get('network', None)
 
-        resp = make_response('fuck you', 200)
+        if network_dict is None:
+            return make_response('no network dingus', 400)
+
+        network = mithril.make_network_from_dict(network_dict)
+
+        add_nodes = body.get('add_nodes', None)
+
+        expanded_network = mithril.add_nodes_to_network(network=network, add_nodes=add_nodes)
+
+        resp = make_response(expanded_network.to_json(), 200)
+
         return resp
 
-    except:
+    except Exception as e:
         resp = make_response('You fucked up', 400)
         return resp
 
@@ -225,30 +256,23 @@ def companies_house_search():
         resp = make_response('You fucked up', 400)
         return resp
 
-# @app.route("/export_timeline")
-# def export_timeline():
-#     body = request.get_json()
-#
-#     try:
-#         network_dict = body.get('network', None)
-#
-#         if network_dict is None:
-#             return make_response('no network dingus', 400)
-#
-#         network = mithril.make_network_from_dict(network_dict)
-#
-#         export_path = body.get('export_path', None)
-#
-#         if export_path is None:
-#             return make_response('no export path dingus', 400)
-#
-#         mithril.export_timeline(network, export_path)
-#
-#         return make_response('success', 200)
-#
-#     except Exception as e:
-#         resp = make_response('You fucked up', 400)
-#         return resp
+
+@app.route("/node_search", methods=['POST'])
+def node_search():
+    body = request.get_json()
+
+    try:
+        search_result = mithril.node_search(query=body['query'],
+                                                       page_number=body['page_number'],
+                                                       search_type=body.get('search_type', None)
+                                                       )
+
+        return make_response(jsonify(search_result), 200)
+    except Exception as e:
+        print(e)
+        resp = make_response('You fucked up', 400)
+        return resp
+
 
 if __name__ == '__main__':
     app.run()
